@@ -5,6 +5,6 @@ public class UserNotFoundException extends RuntimeException{
         super(message);
     }
     public UserNotFoundException(){
-        super("User Not Found!");
+        super("Incorrect password or login");
     }
 }
