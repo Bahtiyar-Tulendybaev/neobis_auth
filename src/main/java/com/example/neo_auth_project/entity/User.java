@@ -1,34 +1,47 @@
 package com.example.neo_auth_project.entity;
 
-
+import com.example.neo_auth_project.entity.enums.Role;
+import com.example.neo_auth_project.entity.enums.UserState;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-
-@Data
-@Table(name = "users")
-@Entity
-
+@Entity @Table(name = "users")
+@NoArgsConstructor
+@AllArgsConstructor
+@Data @Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-
-    @Column(unique = true)
-    private String name;
-    private String dateOfBirth;
-    private String phoneNumber;
-    private String email;
-    private String password;
+    Long id;
     @Enumerated(EnumType.STRING)
-    private Role role;
+    Role role;
+    @Column(unique = true)
+    String username;
+    @Enumerated(EnumType.STRING)
+    UserState state;
+    @Column(name = "uuid")
+    String UUID;
+    @Column(name = "uuid_creation_date")
+    LocalDateTime UUIDExpirationDate;
+    @Column(unique = true)
+    String email;
+    String password;
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority(role.getAuthority()));
+        return  authorities;
+    }
 
     @Override
     public boolean isAccountNonExpired() {
@@ -49,16 +62,4 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-
-        return List.of(new SimpleGrantedAuthority(role.name()));
-    }
-
-    @Override
-    public String getUsername() {
-        return this.name;
-    }
-
 }
