@@ -33,7 +33,7 @@ public class AuthService {
     String mailText = "Please click to link in below to finish registration!";
 
     public String registration(RegistrationRequest request) {
-        if (userRepository.findByUniqConstraint(request.getUsername(), request.getEmail()).isPresent()) {
+        if (userRepository.findByUniqueConstraint(request.getUsername(), request.getEmail()).isPresent()) {
             throw new UserAlreadyExistException("User with username = " + request.getEmail() + " already exist");
         }
         userRepository.save(mapUserRequestToUser(request));
@@ -41,7 +41,7 @@ public class AuthService {
     }
 
     public String sendMessage(RegistrationRequest request, String link) {
-        User user = userRepository.findByUniqConstraint(request.getUsername(), request.getEmail()).orElseThrow(
+        User user = userRepository.findByUniqueConstraint(request.getUsername(), request.getEmail()).orElseThrow(
                 () -> new NotFoundException("User with email = " + request.getEmail() + " not exist")
         );
         String UUID = java.util.UUID.randomUUID().toString();
@@ -49,20 +49,11 @@ public class AuthService {
         user.setUUIDExpirationDate(LocalDateTime.now().plusMinutes(5));
         user.setUUID(UUID);
         userRepository.save(user);
-        return "Письмо отправлено на почту " + request.getEmail();
+        return "The message has been sent by mail " + request.getEmail()+ "\n token: " +  UUID;
     }
 
-    public String sendMessage_dev(RegistrationRequest request, String link) {
-        User user = userRepository.findByUniqConstraint(request.getUsername(), request.getEmail()).orElseThrow(
-                () -> new NotFoundException("User with email = " + request.getEmail() + " not exist")
-        );
-        String UUID = java.util.UUID.randomUUID().toString();
-        user.setUUIDExpirationDate(LocalDateTime.now().plusMinutes(5));
-        user.setUUID(UUID);
-        userRepository.save(user);
-        return link + "?token=" + UUID; // disable for prod
-    }
-    public String ensureRegistration(String UUID) {
+
+    public String confirmRegistration(String UUID) {
         User user = userRepository.findByUUID(UUID).orElseThrow(
                 () -> new NotFoundException("User is not found by UUID = " + UUID)
         );
@@ -102,7 +93,7 @@ public class AuthService {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(email);
         message.setFrom(mail);
-        message.setSubject("Lorby registration!");
+        message.setSubject("registration!");
         message.setTo(email);
         message.setText(mailText + "\n" + link + "?token=" + uuid);
         javaMailSender.send(message);

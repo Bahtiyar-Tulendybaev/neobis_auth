@@ -14,10 +14,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-@Entity @Table(name = "users")
+@Entity
+@Table(name = "users")
 @NoArgsConstructor
 @AllArgsConstructor
-@Data @Builder
+@Data
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class User implements UserDetails {
     @Id
@@ -36,11 +38,12 @@ public class User implements UserDetails {
     @Column(unique = true)
     String email;
     String password;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(role.getAuthority()));
-        return  authorities;
+        return authorities;
     }
 
     @Override

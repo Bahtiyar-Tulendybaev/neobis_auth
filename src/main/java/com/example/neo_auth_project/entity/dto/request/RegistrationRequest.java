@@ -6,7 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
-@Data @Builder
+@Data
+@Builder
 public class RegistrationRequest {
     @Email
     String email;
